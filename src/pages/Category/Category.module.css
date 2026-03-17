@@ -1,0 +1,14 @@
+.catHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.catEmoji { font-size: 32px; }
+.catTitle { font-size: 22px; font-weight: 700; color: var(--navy); }
+.catCount { font-size: 13px; color: var(--light); margin-left: 4px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+}

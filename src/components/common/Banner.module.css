@@ -1,0 +1,96 @@
+.wrap {
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  padding-top: 40%;
+  overflow: hidden;
+  transition: background 0.6s ease;
+}
+
+.content {
+  position: absolute;
+  bottom: 0; left: 0;
+  padding: 32px 36px;
+  z-index: 2;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 2.4vw, 26px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.65);
+}
+
+/* Book stack */
+.books {
+  position: absolute;
+  right: 6%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.book {
+  width: clamp(72px, 9vw, 120px);
+  aspect-ratio: 3 / 4;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #2a3a5a;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.book img { width: 100%; height: 100%; object-fit: cover; }
+
+.book0 { transform: rotate(-8deg) translateY(8px); }
+.book1 { transform: rotate(-3deg) translateY(4px); z-index: 1; }
+.book2 { transform: rotate(2deg)  translateY(0px); z-index: 2; }
+.book3 { transform: rotate(6deg)  translateY(4px); }
+
+/* Dots */
+.dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 3;
+}
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.35);
+  border: none;
+  cursor: pointer;
+  transition: all .3s;
+  padding: 0;
+}
+.dotActive { width: 20px; background: #fff; }
+
+.counter {
+  position: absolute;
+  bottom: 14px;
+  right: 16px;
+  font-size: 12px;
+  color: rgba(255,255,255,.5);
+  z-index: 3;
+}
+
+@media (max-width: 768px) {
+  .books { display: none; }
+  .inner { padding-top: 52%; }
+}

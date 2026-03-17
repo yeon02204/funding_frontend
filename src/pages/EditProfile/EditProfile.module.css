@@ -1,0 +1,82 @@
+.section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color .2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--coral, #ff6b4a);
+}
+
+.msg {
+  font-size: 13px;
+  margin: 8px 0 10px;
+  color: #555;
+}
+
+.saveBtn {
+  margin-top: 4px;
+  padding: 10px 24px;
+  background: var(--coral, #ff6b4a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.saveBtn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.withdrawBtn {
+  padding: 10px 24px;
+  background: #fff;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.withdrawBtn:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.withdrawBtn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}

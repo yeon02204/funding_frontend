@@ -1,0 +1,211 @@
+/* ─── 공통 메시지 ─── */
+.errorMsg {
+  font-size: 13px; color: var(--red);
+  background: var(--red-bg);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
+}
+.successMsg {
+  font-size: 13px; color: var(--green);
+  background: var(--green-bg);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
+}
+
+/* ─── 레이아웃 ─── */
+.wrap {
+  min-height: calc(100vh - var(--header-h));
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 16px;
+  background: var(--bg);
+}
+.box {
+  width: 100%; max-width: 400px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 40px 36px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+/* ─── 로고 ─── */
+.logo {
+  font-family: var(--font-serif);
+  font-size: 28px; font-weight: 700;
+  color: var(--navy);
+  display: block; margin-bottom: 4px;
+}
+.tagline { font-size: 13px; color: var(--light); margin-bottom: 24px; }
+
+/* ─── 소셜 버튼 ─── */
+.social { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+
+.socialBtn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--t-fast), transform var(--t-fast);
+}
+.socialBtn:hover { opacity: 0.9; transform: translateY(-1px); }
+.socialBtn:active { transform: translateY(0); }
+
+/* 카카오 */
+.kakao {
+  background: #FEE500;
+  color: #191919;
+}
+
+/* 네이버 */
+.naver {
+  background: #03C75A;
+  color: #fff;
+}
+
+.socialIcon {
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+}
+.naverIcon {
+  font-size: 15px; font-weight: 900;
+  font-family: var(--font-sans);
+}
+
+/* ─── 구분선 ─── */
+.divider {
+  position: relative;
+  margin: 20px 0 16px;
+  text-align: center;
+}
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+}
+.divider span {
+  position: relative;
+  background: var(--white);
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--light);
+}
+
+/* ─── 로그인/회원가입 토글 ─── */
+.toggle {
+  display: flex;
+  background: var(--bg-subtle);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  margin-bottom: 20px;
+}
+.toggleBtn {
+  flex: 1; padding: 8px;
+  background: none; border: none;
+  border-radius: var(--r-pill);
+  font-size: 14px; font-weight: 500;
+  color: var(--mid); cursor: pointer;
+  transition: all var(--t-base);
+}
+.toggleActive { background: var(--white); color: var(--navy); box-shadow: var(--shadow-sm); }
+
+/* ─── 폼 ─── */
+.form { text-align: left; }
+.field { margin-bottom: 16px; }
+.field label { font-size: 13px; font-weight: 500; color: var(--charcoal); display: block; margin-bottom: 6px; }
+.field input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 14px; color: var(--charcoal);
+  outline: none;
+  transition: border-color var(--t-fast);
+  background: var(--bg);
+}
+.field input:focus { border-color: var(--coral); }
+.field input::placeholder { color: var(--pale); }
+
+/* ─── 서브 탭 헤더 ─── */
+.subHeader { margin-bottom: 20px; }
+.backBtn {
+  background: none; border: none;
+  font-size: 13px; color: var(--mid);
+  cursor: pointer; padding: 0;
+  margin-bottom: 8px;
+  display: block;
+}
+.backBtn:hover { color: var(--coral); }
+.subTitle { font-size: 20px; font-weight: 700; color: var(--navy); }
+
+/* ─── 힌트 ─── */
+.hint { font-size: 12px; color: var(--light); font-weight: 400; }
+
+/* ─── 인증 코드 ─── */
+.verifyDesc {
+  font-size: 13px; color: var(--mid);
+  margin-bottom: 16px; line-height: 1.6;
+}
+.codeRow { display: flex; gap: 8px; margin-bottom: 16px; }
+.codeInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 22px; font-weight: 700;
+  letter-spacing: 8px;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--t-fast);
+  background: var(--bg);
+  color: var(--charcoal);
+}
+.codeInput:focus { border-color: var(--coral); }
+.resendBtn {
+  padding: 0 16px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 13px; color: var(--mid);
+  cursor: pointer; white-space: nowrap;
+  transition: all var(--t-fast);
+}
+.resendBtn:hover { border-color: var(--coral); color: var(--coral); }
+
+/* ─── 하단 링크 ─── */
+.bottomLinks {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-top: 16px;
+}
+.textBtn {
+  background: none; border: none;
+  font-size: 13px; color: var(--mid);
+  cursor: pointer; padding: 0;
+  transition: color var(--t-fast);
+}
+.textBtn:hover { color: var(--coral); }
+.dot { color: var(--pale); font-size: 12px; }
+
+/* ─── 성공 메시지 ─── */
+.successMsg {
+  font-size: 13px; color: #2e7d32;
+  background: #f1f8e9;
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.errorMsg {
+  font-size: 13px; color: var(--coral);
+  background: #fff5f5;
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}

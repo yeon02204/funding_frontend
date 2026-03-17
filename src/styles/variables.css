@@ -1,0 +1,80 @@
+/* ─────────────────────────────────────────
+   Design Tokens  /  CSS Custom Properties
+───────────────────────────────────────── */
+
+:root {
+  /* Brand */
+  --coral:        #E8533A;
+  --coral-light:  #FF6B52;
+  --coral-dark:   #C43B24;
+  --coral-bg:     #FFF3F0;
+  --coral-muted:  rgba(232, 83, 58, 0.1);
+
+  /* Neutrals */
+  --navy:         #1C1C2E;
+  --charcoal:     #333344;
+  --mid:          #666677;
+  --light:        #9999AA;
+  --pale:         #CCCCDD;
+  --border:       #E8E8EE;
+  --border-mid:   #D4D4DE;
+  --bg:           #FAFAF8;
+  --bg-subtle:    #F4F4F8;
+  --white:        #FFFFFF;
+
+  /* Status */
+  --green:        #2ECC71;
+  --green-bg:     rgba(46,204,113,.1);
+  --yellow:       #F1C40F;
+  --yellow-bg:    rgba(241,196,15,.1);
+  --red:          #E74C3C;
+  --red-bg:       rgba(231,76,60,.1);
+  --blue:         #3498DB;
+  --blue-bg:      rgba(52,152,219,.1);
+
+  /* Typography */
+  --font-serif:  'Noto Serif KR', 'Georgia', serif;
+  --font-sans:   'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --font-mono:   'JetBrains Mono', 'Courier New', monospace;
+
+  /* Spacing scale */
+  --s1:  4px;
+  --s2:  8px;
+  --s3:  12px;
+  --s4:  16px;
+  --s5:  20px;
+  --s6:  24px;
+  --s8:  32px;
+  --s10: 40px;
+  --s12: 48px;
+
+  /* Radius */
+  --r-sm:  4px;
+  --r-md:  8px;
+  --r-lg:  12px;
+  --r-xl:  16px;
+  --r-pill: 999px;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 4px  rgba(28, 28, 46, .06);
+  --shadow-md:   0 2px 12px rgba(28, 28, 46, .09);
+  --shadow-lg:   0 8px 28px rgba(28, 28, 46, .14);
+  --shadow-xl:   0 16px 48px rgba(28, 28, 46, .18);
+
+  /* Layout */
+  --page-max:  1280px;
+  --page-pad:  24px;
+
+  /* Header */
+  --header-h:  100px;   /* top + nav combined */
+
+  /* Transitions */
+  --t-fast:    0.12s ease;
+  --t-base:    0.22s ease;
+  --t-slow:    0.38s ease;
+}
+
+/* Dark mode placeholder – extend later */
+@media (prefers-color-scheme: dark) {
+  /* :root { ... } */
+}
