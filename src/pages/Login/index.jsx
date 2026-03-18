@@ -62,8 +62,20 @@ export default function Login() {
   /* ── 회원가입 → 인증 코드 발송 ── */
   const handleRegister = async () => {
     if (form.password.length < 8) { showMsg("비밀번호는 8자 이상이어야 합니다."); return; }
-    await register({ email: form.email, password: form.password, nickname: form.nickname });
-    // 가입 완료 후 인증 코드 발송
+    try {
+      await register({ email: form.email, password: form.password, nickname: form.nickname });
+    } catch (e) {
+      const msg = e.response?.data?.message ?? "";
+      // 이미 가입된 이메일인데 미인증 상태면 인증코드 재발송
+      if (e.response?.status === 409 && msg.includes("이메일")) {
+        showMsg("이미 가입된 이메일입니다. 인증 코드를 재발송합니다.", "success");
+        await sendVerification(form.email);
+        goTab("verify");
+        return;
+      }
+      showMsg(msg || "회원가입 실패");
+      return;
+    }
     await sendVerification(form.email);
     showMsg("이메일로 인증 코드를 발송했습니다. 5분 내로 입력해주세요.", "success");
     goTab("verify");
@@ -180,7 +192,9 @@ export default function Login() {
         {/* ── 서브 탭 제목 (verify 이후) ── */}
         {meta.title && (
           <div className={styles.subHeader}>
-            <button className={styles.backBtn} onClick={() => goTab("login")}>← 돌아가기</button>
+            {tab !== "verify" && (
+              <button className={styles.backBtn} onClick={() => goTab("login")}>← 돌아가기</button>
+            )}
             <h2 className={styles.subTitle}>{meta.title}</h2>
           </div>
         )}
