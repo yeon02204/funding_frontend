@@ -64,9 +64,10 @@ export default function Login() {
     if (form.password.length < 8) { showMsg("비밀번호는 8자 이상이어야 합니다."); return; }
     try {
       await register({ email: form.email, password: form.password, nickname: form.nickname });
+      showMsg("회원가입이 완료되었습니다! 로그인해주세요.", "success");
+      goTab("login");  // ← 이거 추가
     } catch (e) {
       const msg = e.response?.data?.message ?? "";
-      // 이미 가입된 이메일인데 미인증 상태면 인증코드 재발송
       if (e.response?.status === 409 && msg.includes("이메일")) {
         showMsg("이미 가입된 이메일입니다. 인증 코드를 재발송합니다.", "success");
         await sendVerification(form.email);
