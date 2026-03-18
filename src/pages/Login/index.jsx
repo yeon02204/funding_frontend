@@ -65,21 +65,16 @@ export default function Login() {
     try {
       await register({ email: form.email, password: form.password, nickname: form.nickname });
       showMsg("회원가입이 완료되었습니다! 로그인해주세요.", "success");
-      goTab("login");  // ← 이거 추가
+      goTab("login");
     } catch (e) {
       const msg = e.response?.data?.message ?? "";
       if (e.response?.status === 409 && msg.includes("이메일")) {
-        showMsg("이미 가입된 이메일입니다. 인증 코드를 재발송합니다.", "success");
-        await sendVerification(form.email);
-        goTab("verify");
-        return;
-      }
+    showMsg("이미 사용 중인 이메일입니다.", "error");
+    return;
+}
       showMsg(msg || "회원가입 실패");
       return;
     }
-    await sendVerification(form.email);
-    showMsg("이메일로 인증 코드를 발송했습니다. 5분 내로 입력해주세요.", "success");
-    goTab("verify");
   };
 
   /* ── 이메일 인증 코드 확인 ── */
