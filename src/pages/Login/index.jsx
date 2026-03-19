@@ -28,7 +28,7 @@ export default function Login() {
   const [tab, setTab] = useState(urlToken || isResetPath ? "reset-password" : "login");
 
   const [form,    setForm]    = useState({
-    email: "", password: "", nickname: "",
+    email: "admin@yeon.monster", password: "fundit1234!", nickname: "",
     code: "",
     resetToken: urlToken ?? "", newPassword: "", newPasswordConfirm: "",
     findNickname: "",
