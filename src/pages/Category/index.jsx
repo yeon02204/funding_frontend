@@ -1,39 +1,52 @@
 /* ─────────────────────────────────────────
    pages/Category/index.jsx — 실제 API
 ───────────────────────────────────────── */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProjectCard from "../../components/common/ProjectCard";
 import { useProjects } from "../../hooks/useProjects";
-import { CATEGORIES } from "../../data/mockData";
+import { getCategories } from "../../api/categories";
 import styles from "./Category.module.css";
 
 const PAGE_SIZE = 12;
 
-export default function Category() {
-  const { slug }  = useParams();
-  const [page, setPage] = useState(0);
+const CATEGORY_ICONS = {
+  "보드게임·TRPG": "🎲", "디지털 게임": "🕹️", "웹툰·만화": "📖",
+  "웹툰 리소스": "✏️", "디자인 문구": "📝", "캐릭터·굿즈": "🧸",
+  "홈·리빙": "🏠", "테크·가전": "💻", "개발·프로그래밍": "🖥️",
+  "푸드": "🍽️", "향수·뷰티": "🌸", "의류": "👗", "잡화": "👜",
+  "주얼리": "💎", "반려동물": "🐾", "출판": "📚", "디자인": "🎨",
+  "예술": "🖼️", "사진": "📷", "음악": "🎵", "공연": "🎭", "영화·비디오": "🎬",
+};
 
-  // slug가 카테고리 이름 (예: "게임", "음악")
-  const cat = CATEGORIES.find(c => c.id === slug || c.label === slug);
+export default function Category() {
+  const { slug } = useParams();
+  const [page, setPage] = useState(0);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(() => {});
+  }, []);
+
+  // slug로 카테고리 찾기 (DB 이름 기준)
+  const cat = categories.find(c => c.name === slug);
 
   const { data, loading } = useProjects({
     status: "FUNDING",
-    keyword: cat?.label !== "전체" ? undefined : undefined,
-    categoryId: undefined, // 추후 서버에서 categoryId 매핑 필요
-    keyword: cat?.label && cat.id !== "all" ? cat.label : undefined,
+    categoryId: cat?.id,
     page,
     size: PAGE_SIZE,
   });
 
   const projects   = data?.content ?? [];
   const totalPages = data?.totalPages ?? 0;
+  const icon       = CATEGORY_ICONS[slug] ?? "📦";
 
   return (
     <div className="page-wrap animate-fade-up">
       <div className={styles.catHead}>
-        <span className={styles.catEmoji}>{cat?.icon ?? "📦"}</span>
-        <h2 className={styles.catTitle}>{cat?.label ?? slug}</h2>
+        <span className={styles.catEmoji}>{icon}</span>
+        <h2 className={styles.catTitle}>{slug}</h2>
         <span className={styles.catCount}>{data?.totalElements ?? projects.length}개 프로젝트</span>
       </div>
 
@@ -41,7 +54,7 @@ export default function Category() {
         <div className="empty-state"><p>로딩 중...</p></div>
       ) : projects.length === 0 ? (
         <div className="empty-state">
-          <div className="icon">{cat?.icon ?? "📦"}</div>
+          <div className="icon">{icon}</div>
           <p>진행 중인 프로젝트가 없습니다</p>
         </div>
       ) : (
