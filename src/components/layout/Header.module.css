@@ -187,7 +187,7 @@
 .catBtnActive {
   color: var(--coral);
   font-weight: 600;
-  border-bottom-color: var(--coral);
+  border-bottom-color: transparent;
 }
 
 /* ── Category Dropdown — 전체 너비 ── */
