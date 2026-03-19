@@ -4,6 +4,7 @@
   z-index: 100;
   background: var(--white);
   border-bottom: 1px solid var(--border);
+  overflow: visible;  /* 추가 */
 }
 
 /* ── Top row ── */
