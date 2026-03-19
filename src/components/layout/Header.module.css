@@ -130,6 +130,7 @@
   padding: 0 var(--page-pad);
   overflow-x: auto;
   border-top: 1px solid var(--border);
+  position: relative;
 }
 .nav::-webkit-scrollbar { display: none; }
 
@@ -145,7 +146,7 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   transition: color var(--t-fast);
   margin-bottom: -1px;
 }
@@ -164,10 +165,69 @@
   border-radius: 50%;
 }
 
+/* ── Category Dropdown ── */
+.catWrapper {
+  position: relative;
+}
+
+.catDropdown {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 16px;
+  z-index: 200;
+  min-width: 480px;
+  animation: fadeDown 0.15s ease;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.catDropItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--charcoal);
+  transition: background var(--t-fast);
+  text-align: left;
+  white-space: nowrap;
+}
+.catDropItem:hover {
+  background: var(--bg-subtle);
+  color: var(--coral);
+}
+
+.catDropIcon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .actions { gap: 8px; }
   .actionBtn { display: none; }
   .divider { display: none; }
+  .catDropdown { min-width: 300px; }
+  .catGrid { grid-template-columns: repeat(3, 1fr); }
 }
 
 .adminBtn {

@@ -2,27 +2,51 @@
    components/layout/Header.jsx
 ───────────────────────────────────────── */
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NAV_LINKS } from "../../data/mockData";
 import { useAuth } from "../../context/AuthContext";
+import { getCategories } from "../../api/categories";
 import styles from "./Header.module.css";
 
+const CATEGORY_ICONS = {
+  "보드게임·TRPG": "🎲", "디지털 게임": "🕹️", "웹툰·만화": "📖",
+  "웹툰 리소스": "✏️", "디자인 문구": "📝", "캐릭터·굿즈": "🧸",
+  "홈·리빙": "🏠", "테크·가전": "💻", "개발·프로그래밍": "🖥️",
+  "푸드": "🍽️", "향수·뷰티": "🌸", "의류": "👗", "잡화": "👜",
+  "주얼리": "💎", "반려동물": "🐾", "출판": "📚", "디자인": "🎨",
+  "예술": "🖼️", "사진": "📷", "음악": "🎵", "공연": "🎭", "영화·비디오": "🎬",
+};
+
 export default function Header() {
-  const navigate          = useNavigate();
-  const [query, setQuery] = useState("");
-  const { user, logout }  = useAuth();
+  const navigate            = useNavigate();
+  const [query, setQuery]   = useState("");
+  const { user, logout }    = useAuth();
+  const [catOpen, setCatOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const catRef = useRef(null);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(() => {});
+  }, []);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handler = (e) => {
+      if (catRef.current && !catRef.current.contains(e.target)) {
+        setCatOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (query.trim()) navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+  const handleLogout = () => { logout(); navigate("/"); };
 
-  // 프로젝트 올리기 — 비로그인이면 로그인 페이지로
   const handleCreateProject = () => {
     if (!user) { navigate("/login"); return; }
     navigate("/project/new");
@@ -54,28 +78,59 @@ export default function Header() {
           <span className={styles.divider}>|</span>
 
           {user ? (
-            /* ── 로그인 상태 ── */
             <>
               <span className={styles.nickname}>{user.nickname}님</span>
-              <button className={styles.logoutBtn} onClick={handleLogout}>
-                로그아웃
-              </button>
+              <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
               <Link to="/mypage" className={styles.creatorBtn}>마이페이지</Link>
               {user.role === "ADMIN" && (
                 <Link to="/admin" className={styles.adminBtn}>관리자</Link>
               )}
             </>
           ) : (
-            /* ── 비로그인 상태 — 창작자센터 숨김 ── */
-            <>
-              <Link to="/login" className={styles.loginBtn}>로그인/회원가입</Link>
-            </>
+            <Link to="/login" className={styles.loginBtn}>로그인/회원가입</Link>
           )}
         </div>
       </div>
 
       {/* ── Nav Row ── */}
       <nav className={styles.nav}>
+        {/* 카테고리 드롭다운 버튼 */}
+        <div className={styles.catWrapper} ref={catRef}>
+          <button
+            className={`${styles.navItem} ${catOpen ? styles.active : ""}`}
+            onClick={() => setCatOpen(v => !v)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+            카테고리
+          </button>
+
+          {catOpen && (
+            <div className={styles.catDropdown}>
+              <div className={styles.catGrid}>
+                <button
+                  className={styles.catDropItem}
+                  onClick={() => { navigate("/search"); setCatOpen(false); }}
+                >
+                  <span className={styles.catDropIcon}>⊞</span>
+                  <span>전체</span>
+                </button>
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    className={styles.catDropItem}
+                    onClick={() => { navigate(`/category/${cat.name}`); setCatOpen(false); }}
+                  >
+                    <span className={styles.catDropIcon}>{CATEGORY_ICONS[cat.name] ?? "📦"}</span>
+                    <span>{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         {NAV_LINKS.map(({ label, path, badge }) => (
           <NavLink
             key={path}
