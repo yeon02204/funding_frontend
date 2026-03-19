@@ -12,28 +12,12 @@ import { getCategories } from "../../api/categories";
 import styles from "./Home.module.css";
 
 const CATEGORY_ICONS = {
-  "보드게임·TRPG": "🎲",
-  "디지털 게임": "🕹️",
-  "웹툰·만화": "📖",
-  "웹툰 리소스": "✏️",
-  "디자인 문구": "📝",
-  "캐릭터·굿즈": "🧸",
-  "홈·리빙": "🏠",
-  "테크·가전": "💻",
-  "개발·프로그래밍": "🖥️",
-  "푸드": "🍽️",
-  "향수·뷰티": "🌸",
-  "의류": "👗",
-  "잡화": "👜",
-  "주얼리": "💎",
-  "반려동물": "🐾",
-  "출판": "📚",
-  "디자인": "🎨",
-  "예술": "🖼️",
-  "사진": "📷",
-  "음악": "🎵",
-  "공연": "🎭",
-  "영화·비디오": "🎬",
+  "보드게임·TRPG": "🎲", "디지털 게임": "🕹️", "웹툰·만화": "📖",
+  "웹툰 리소스": "✏️", "디자인 문구": "📝", "캐릭터·굿즈": "🧸",
+  "홈·리빙": "🏠", "테크·가전": "💻", "개발·프로그래밍": "🖥️",
+  "푸드": "🍽️", "향수·뷰티": "🌸", "의류": "👗", "잡화": "👜",
+  "주얼리": "💎", "반려동물": "🐾", "출판": "📚", "디자인": "🎨",
+  "예술": "🖼️", "사진": "📷", "음악": "🎵", "공연": "🎭", "영화·비디오": "🎬",
 };
 
 export default function Home() {
@@ -41,14 +25,11 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
-  // 카테고리 API에서 가져오기
   useEffect(() => {
     getCategories().then(setCategories).catch(() => {});
   }, []);
 
-  // 인기 프로젝트 (좋아요순)
   const { data: popularData } = useProjects({ status: "FUNDING", sortBy: "likes", size: 4 });
-  // 신규 프로젝트 (최신순)
   const { data: newData, loading: newLoading } = useProjects({ status: "FUNDING", size: 8 });
 
   const popular = popularData?.content ?? [];
@@ -66,8 +47,6 @@ export default function Home() {
 
       <div className="page-wrap">
         <div className="two-col">
-
-          {/* ── Left ── */}
           <div>
             <section className={`${styles.section} animate-fade-up`}>
               <Banner />
@@ -77,7 +56,7 @@ export default function Home() {
             <section className={`${styles.section} animate-fade-up-1`}>
               <div className={`${styles.catRow} no-scrollbar`}>
                 {/* 고정 숏컷 탭 */}
-                {SHORTCUT_TABS.filter(t => !t.isCat).map(c => (
+                {SHORTCUT_TABS.map(c => (
                   <button
                     key={c.label}
                     className={styles.catItem}
@@ -87,7 +66,7 @@ export default function Home() {
                     <span className={styles.catLabel}>{c.label}</span>
                   </button>
                 ))}
-                {/* DB에서 가져온 카테고리 */}
+                {/* DB 카테고리 */}
                 {categories.map(cat => (
                   <button
                     key={cat.id}
@@ -101,21 +80,17 @@ export default function Home() {
               </div>
             </section>
 
-            {/* 주목할 만한 프로젝트 */}
             <section className={`${styles.section} animate-fade-up-2`}>
               <div className="section-header">
                 <h2 className="section-title">주목할 만한 프로젝트</h2>
                 <span className="section-link" onClick={() => navigate("/popular")}>전체보기</span>
               </div>
               {popular.length > 0
-                ? <div className={styles.grid}>
-                    {popular.map(p => <ProjectCard key={p.id} project={p} />)}
-                  </div>
+                ? <div className={styles.grid}>{popular.map(p => <ProjectCard key={p.id} project={p} />)}</div>
                 : <div className={styles.emptySection}>등록된 프로젝트가 없습니다.</div>
               }
             </section>
 
-            {/* 신규 프로젝트 */}
             <section className={`${styles.section} animate-fade-up-3`}>
               <div className="section-header">
                 <h2 className="section-title">신규 프로젝트</h2>
@@ -124,15 +99,12 @@ export default function Home() {
               {newLoading
                 ? <div className={styles.emptySection}>로딩 중...</div>
                 : newList.length > 0
-                  ? <div className={styles.grid}>
-                      {newList.map(p => <ProjectCard key={p.id} project={p} />)}
-                    </div>
+                  ? <div className={styles.grid}>{newList.map(p => <ProjectCard key={p.id} project={p} />)}</div>
                   : <div className={styles.emptySection}>등록된 프로젝트가 없습니다.</div>
               }
             </section>
           </div>
 
-          {/* ── Right Sidebar ── */}
           <aside className="sticky-aside animate-fade-up-1">
             <div className={`card ${styles.popularCard}`}>
               <div className={styles.popularHead}>
@@ -146,13 +118,10 @@ export default function Home() {
               </div>
               {popular.length > 0
                 ? popular.map((p, i) => <PopularItem key={p.id} project={p} rank={i + 1} />)
-                : <p style={{ fontSize: 13, color: "var(--light)", padding: "12px 0" }}>
-                    아직 프로젝트가 없습니다.
-                  </p>
+                : <p style={{ fontSize: 13, color: "var(--light)", padding: "12px 0" }}>아직 프로젝트가 없습니다.</p>
               }
             </div>
           </aside>
-
         </div>
       </div>
     </>
