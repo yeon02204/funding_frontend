@@ -103,6 +103,7 @@ export default function Header() {
 
           {catOpen && (
             <div className={styles.catDropdown}>
+              <div className={styles.catInner}>
               <div className={styles.catGrid}>
                 <button
                   className={styles.catDropItem}
@@ -121,6 +122,7 @@ export default function Header() {
                     <span className={styles.catDropLabel}>{cat.name}</span>
                   </button>
                 ))}
+              </div>
               </div>
             </div>
           )}
