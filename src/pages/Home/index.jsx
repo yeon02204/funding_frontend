@@ -1,18 +1,50 @@
 /* ─────────────────────────────────────────
    pages/Home/index.jsx — 실제 API 연동
 ───────────────────────────────────────── */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Banner      from "../../components/common/Banner";
 import ProjectCard from "../../components/common/ProjectCard";
 import PopularItem from "../../components/common/PopularItem";
 import { useProjects } from "../../hooks/useProjects";
 import { SHORTCUT_TABS } from "../../data/mockData";
+import { getCategories } from "../../api/categories";
 import styles from "./Home.module.css";
+
+const CATEGORY_ICONS = {
+  "보드게임·TRPG": "🎲",
+  "디지털 게임": "🕹️",
+  "웹툰·만화": "📖",
+  "웹툰 리소스": "✏️",
+  "디자인 문구": "📝",
+  "캐릭터·굿즈": "🧸",
+  "홈·리빙": "🏠",
+  "테크·가전": "💻",
+  "개발·프로그래밍": "🖥️",
+  "푸드": "🍽️",
+  "향수·뷰티": "🌸",
+  "의류": "👗",
+  "잡화": "👜",
+  "주얼리": "💎",
+  "반려동물": "🐾",
+  "출판": "📚",
+  "디자인": "🎨",
+  "예술": "🖼️",
+  "사진": "📷",
+  "음악": "🎵",
+  "공연": "🎭",
+  "영화·비디오": "🎬",
+};
 
 export default function Home() {
   const [notice, setNotice] = useState(true);
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+
+  // 카테고리 API에서 가져오기
+  useEffect(() => {
+    getCategories().then(setCategories).catch(() => {});
+  }, []);
 
   // 인기 프로젝트 (좋아요순)
   const { data: popularData } = useProjects({ status: "FUNDING", sortBy: "likes", size: 4 });
@@ -44,7 +76,8 @@ export default function Home() {
             {/* 카테고리 단축 탭 */}
             <section className={`${styles.section} animate-fade-up-1`}>
               <div className={`${styles.catRow} no-scrollbar`}>
-                {SHORTCUT_TABS.map(c => (
+                {/* 고정 숏컷 탭 */}
+                {SHORTCUT_TABS.filter(t => !t.isCat).map(c => (
                   <button
                     key={c.label}
                     className={styles.catItem}
@@ -52,6 +85,17 @@ export default function Home() {
                   >
                     <div className={styles.catIcon}>{c.icon}</div>
                     <span className={styles.catLabel}>{c.label}</span>
+                  </button>
+                ))}
+                {/* DB에서 가져온 카테고리 */}
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    className={styles.catItem}
+                    onClick={() => navigate(`/category/${cat.name}`)}
+                  >
+                    <div className={styles.catIcon}>{CATEGORY_ICONS[cat.name] ?? "📦"}</div>
+                    <span className={styles.catLabel}>{cat.name}</span>
                   </button>
                 ))}
               </div>
