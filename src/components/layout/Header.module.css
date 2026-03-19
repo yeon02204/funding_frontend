@@ -128,11 +128,9 @@
   margin: 0 auto;
   display: flex;
   padding: 0 var(--page-pad);
-  overflow-x: auto;
   border-top: 1px solid var(--border);
   position: relative;
 }
-.nav::-webkit-scrollbar { display: none; }
 
 .navItem {
   font-size: 14px;
@@ -182,6 +180,8 @@
   z-index: 200;
   min-width: 480px;
   animation: fadeDown 0.15s ease;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
 @keyframes fadeDown {
