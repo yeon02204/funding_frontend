@@ -81,10 +81,14 @@ export default function Login() {
   /* ── 이메일 인증 코드 확인 ── */
   const handleVerify = async () => {
     if (form.code.length !== 6) { showMsg("6자리 코드를 입력해주세요."); return; }
-    await verifyEmail({ email: form.email, code: form.code });
-    showMsg("이메일 인증이 완료됐어요! 로그인해주세요.", "success");
-    goTab("login");
-  };
+    try {
+      await verifyEmail({ email: form.email, code: form.code });
+      showMsg("이메일 인증이 완료됐어요! 로그인해주세요.", "success");
+      setTimeout(() => goTab("login"), 1500);
+    } catch (e) {
+      showMsg(e.response?.data?.message ?? "인증 실패. 다시 시도해주세요.");
+    }
+};
 
   /* ── 코드 재발송 ── */
   const handleResend = async () => {
