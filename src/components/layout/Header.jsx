@@ -18,27 +18,25 @@ const CATEGORY_ICONS = {
 };
 
 export default function Header() {
-  const navigate            = useNavigate();
-  const [query, setQuery]   = useState("");
-  const { user, logout }    = useAuth();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const { user, logout } = useAuth();
   const [catOpen, setCatOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const catRef = useRef(null);
+  const closeTimer = useRef(null);
 
   useEffect(() => {
     getCategories().then(setCategories).catch(() => {});
   }, []);
 
-  // 외부 클릭 시 드롭다운 닫기
-  useEffect(() => {
-    const handler = (e) => {
-      if (catRef.current && !catRef.current.contains(e.target)) {
-        setCatOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const handleMouseEnter = () => {
+    clearTimeout(closeTimer.current);
+    setCatOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimer.current = setTimeout(() => setCatOpen(false), 150);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -54,7 +52,6 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      {/* ── Top Row ── */}
       <div className={styles.top}>
         <Link to="/" className={styles.logo}>Fundit</Link>
 
@@ -72,19 +69,14 @@ export default function Header() {
         </form>
 
         <div className={styles.actions}>
-          <button className={styles.actionBtn} onClick={handleCreateProject}>
-            프로젝트 올리기
-          </button>
+          <button className={styles.actionBtn} onClick={handleCreateProject}>프로젝트 올리기</button>
           <span className={styles.divider}>|</span>
-
           {user ? (
             <>
               <span className={styles.nickname}>{user.nickname}님</span>
               <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
               <Link to="/mypage" className={styles.creatorBtn}>마이페이지</Link>
-              {user.role === "ADMIN" && (
-                <Link to="/admin" className={styles.adminBtn}>관리자</Link>
-              )}
+              {user.role === "ADMIN" && <Link to="/admin" className={styles.adminBtn}>관리자</Link>}
             </>
           ) : (
             <Link to="/login" className={styles.loginBtn}>로그인/회원가입</Link>
@@ -92,16 +84,19 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Nav Row ── */}
+      {/* Nav */}
       <nav className={styles.nav}>
-        {/* 카테고리 드롭다운 버튼 */}
-        <div className={styles.catWrapper} ref={catRef}>
-          <button
-            className={`${styles.navItem} ${catOpen ? styles.active : ""}`}
-            onClick={() => setCatOpen(v => !v)}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        {/* 카테고리 드롭다운 */}
+        <div
+          className={styles.catWrapper}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <button className={`${styles.navItem} ${styles.catBtn} ${catOpen ? styles.catBtnActive : ""}`}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
             </svg>
             카테고리
           </button>
@@ -114,7 +109,7 @@ export default function Header() {
                   onClick={() => { navigate("/search"); setCatOpen(false); }}
                 >
                   <span className={styles.catDropIcon}>⊞</span>
-                  <span>전체</span>
+                  <span className={styles.catDropLabel}>전체</span>
                 </button>
                 {categories.map(cat => (
                   <button
@@ -123,7 +118,7 @@ export default function Header() {
                     onClick={() => { navigate(`/category/${cat.name}`); setCatOpen(false); }}
                   >
                     <span className={styles.catDropIcon}>{CATEGORY_ICONS[cat.name] ?? "📦"}</span>
-                    <span>{cat.name}</span>
+                    <span className={styles.catDropLabel}>{cat.name}</span>
                   </button>
                 ))}
               </div>
@@ -135,9 +130,7 @@ export default function Header() {
           <NavLink
             key={path}
             to={path}
-            className={({ isActive }) =>
-              `${styles.navItem} ${isActive ? styles.active : ""}`
-            }
+            className={({ isActive }) => `${styles.navItem} ${isActive && !catOpen ? styles.active : ""}`}
             end={path === "/"}
           >
             {badge && <span className={styles.navDot} />}
