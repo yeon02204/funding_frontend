@@ -5,8 +5,13 @@
 import { Outlet, ScrollRestoration } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Layout() {
+  const { loading } = useAuth();
+
+  if (loading) return <div style={{ minHeight: "100vh" }} />;
+
   return (
     <>
       <ScrollRestoration />
