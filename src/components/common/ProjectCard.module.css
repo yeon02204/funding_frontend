@@ -23,7 +23,7 @@
 .thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;        /* cover → contain 으로 변경 (잘림 방지) */
   transition: transform var(--t-slow);
 }
 .card:hover .thumb img { transform: scale(1.05); }
