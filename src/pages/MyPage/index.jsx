@@ -30,7 +30,9 @@ export default function MyPage() {
   /* 데이터 로드 */
   useEffect(() => {
     if (!user) return;
-    getMyProjects().then(setMyProjects).catch(() => {});
+    getMyProjects()
+      .then(data => setMyProjects(data.filter(p => p.status !== "DELETED"))) // ← DELETED 제외
+      .catch(() => {});
     getMyDonations().then(setDonations).catch(() => {});
     getMyLikes().then(setLikes).catch(() => {});
   }, [user]);
