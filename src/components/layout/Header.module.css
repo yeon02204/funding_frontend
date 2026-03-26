@@ -17,15 +17,21 @@
 }
 
 .logo {
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--navy);
-  letter-spacing: -.5px;
   white-space: nowrap;
   text-decoration: none;
   transition: opacity var(--t-fast);
+  display: flex;
+  align-items: center;
 }
+
+.logoImg {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  display: block;
+}
+
 .logo:hover { opacity: .72; }
 
 .searchWrap {
