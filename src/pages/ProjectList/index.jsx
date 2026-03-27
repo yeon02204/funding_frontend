@@ -12,9 +12,9 @@ const PAGE_SIZE = 12;
 // 페이지 타입별 기본 파라미터
 const PRESET = {
   "인기 프로젝트":  { status: "FUNDING", sortBy: "likes" },
-  "신규 프로젝트":  { status: "FUNDING" },
-  "마감임박":       { status: "FUNDING", sortBy: "deadline" },
-  "공개예정":       { status: "APPROVED" },
+  "신규 프로젝트":  { status: "FUNDING", sort: "createdAt,desc" },
+  "마감임박":       { status: "FUNDING", sort: "deadline,asc" },  // 마감일 오름차순
+  "공개예정":       { status: "APPROVED", sort: "startAt,asc" },  // 시작일 오름차순
 };
 
 export default function ProjectList({ title = "프로젝트 목록" }) {
