@@ -8,7 +8,7 @@ import styles from "./PopularItem.module.css";
 
 export default function PopularItem({ project, rank }) {
   const navigate = useNavigate();
-  const pct = calcPct(project.currentAmount, project.goalAmount);
+  const pct = project.progressPercent ?? calcPct(project.currentAmount, project.goalAmount);
 
   return (
     <div
