@@ -15,7 +15,7 @@ export default function Home() {
   const navigate = useNavigate();
 
 
-  const { data: popularData } = useProjects({ status: "FUNDING", sortBy: "likes", size: 4 });
+  const { data: popularData } = useProjects({ status: "FUNDING", sortBy: "likes", size: 6 });
   const { data: newData, loading: newLoading } = useProjects({ status: "FUNDING", size: 8 });
 
   const popular = popularData?.content ?? [];
