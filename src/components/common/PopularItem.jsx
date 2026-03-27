@@ -20,7 +20,7 @@ export default function PopularItem({ project, rank }) {
     >
       <span className={styles.rank}>{rank}</span>
       <div className={styles.thumb}>
-        <img src={project.thumbnail} alt="" loading="lazy" />
+        <img src={project.thumbnailUrl} alt="" loading="lazy" />  {/* thumbnail → thumbnailUrl */}
       </div>
       <div className={styles.info}>
         <p className={styles.creator}>{project.creator}</p>
