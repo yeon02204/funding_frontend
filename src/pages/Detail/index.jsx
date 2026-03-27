@@ -7,7 +7,7 @@ import { useProject } from "../../hooks/useProjects";
 import { fmtAmount, fmtNumber } from "../../utils/format";
 import { Tabs, TabPanel } from "../../components/ui/Tabs";
 import { donate } from "../../api/donations";
-import { likeProject, unlikeProject, requestReview, requestDelete, getProjectTags, updateProject } from "../../api/projects";
+import { likeProject, unlikeProject, requestReview, requestDelete, deleteRejectedProject, getProjectTags, updateProject } from "../../api/projects";
 import { followUser, unfollowUser, isFollowing } from "../../api/users";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/ui/Button";
@@ -177,6 +177,18 @@ export default function Detail() {
     }
   };
 
+  /* ── 반려된 프로젝트 즉시 삭제 ── */
+  const handleDeleteRejected = async () => {
+    if (!window.confirm("반려된 프로젝트를 삭제하시겠습니까? 되돌릴 수 없습니다.")) return;
+    try {
+      await deleteRejectedProject(id);
+      alert("프로젝트가 삭제되었습니다.");
+      navigate("/mypage");
+    } catch (e) {
+      alert(e.response?.data?.message ?? "삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   /* ── 상태 한글 ── */
   const statusLabel = {
     DRAFT:            "초안",
@@ -320,28 +332,58 @@ export default function Detail() {
             {/* ── 내 프로젝트 관리 버튼 ── */}
             {isOwner && (
               <div className={styles.ownerActions}>
+                {/* DRAFT: 수정 + 심사요청 + 삭제요청 */}
                 {project.status === "DRAFT" && (
-                  <Button
-                    fullWidth variant="outline-coral" size="sm"
-                    onClick={() => navigate(`/projects/${id}/edit`)}
-                  >
-                    수정하기
-                  </Button>
+                  <>
+                    <Button fullWidth variant="outline-coral" size="sm"
+                      onClick={() => navigate(`/projects/${id}/edit`)}>
+                      수정하기
+                    </Button>
+                    <Button fullWidth variant="outline-coral" size="sm"
+                      onClick={handleReviewRequest} disabled={reviewing}>
+                      {reviewing ? "요청 중..." : "심사 요청하기"}
+                    </Button>
+                    <button className={styles.deleteReqBtn} onClick={handleDeleteRequest}>
+                      삭제 요청
+                    </button>
+                  </>
                 )}
-                {(project.status === "DRAFT" || project.status === "REJECTED") && (
-                  <Button
-                    fullWidth variant="outline-coral" size="sm"
-                    onClick={handleReviewRequest}
-                    disabled={reviewing}
-                  >
-                    {reviewing ? "요청 중..." : "심사 요청하기"}
-                  </Button>
+
+                {/* REJECTED: 수정 + 심사재요청 + 즉시삭제 */}
+                {project.status === "REJECTED" && (
+                  <>
+                    <p className={styles.reviewingMsg}>❌ 반려되었습니다. 수정 후 다시 심사 요청하세요.</p>
+                    <Button fullWidth variant="outline-coral" size="sm"
+                      onClick={() => navigate(`/projects/${id}/edit`)}>
+                      수정하기
+                    </Button>
+                    <Button fullWidth variant="outline-coral" size="sm"
+                      onClick={handleReviewRequest} disabled={reviewing}>
+                      {reviewing ? "요청 중..." : "심사 재요청"}
+                    </Button>
+                    <button className={styles.deleteReqBtn} onClick={handleDeleteRejected}>
+                      삭제하기
+                    </button>
+                  </>
                 )}
+
+                {/* REVIEW_REQUESTED: 심사중 안내 + 삭제요청 */}
                 {project.status === "REVIEW_REQUESTED" && (
-                  <p className={styles.reviewingMsg}>🔍 심사 중입니다. 검토 후 승인됩니다.</p>
+                  <>
+                    <p className={styles.reviewingMsg}>🔍 심사 중입니다. 검토 후 승인됩니다.</p>
+                    <button className={styles.deleteReqBtn} onClick={handleDeleteRequest}>
+                      삭제 요청
+                    </button>
+                  </>
                 )}
+
                 {project.status === "APPROVED" && (
                   <p className={styles.reviewingMsg}>✅ 승인되었습니다. 시작일에 자동으로 펀딩이 시작됩니다.</p>
+                )}
+                {project.status === "FUNDING" && (
+                  <button className={styles.deleteReqBtn} onClick={handleDeleteRequest}>
+                    삭제 요청
+                  </button>
                 )}
                 {project.status === "DELETE_REQUESTED" && (
                   <p className={styles.reviewingMsg}>🗑️ 삭제 요청이 접수되었습니다. 관리자 검토 후 처리됩니다.</p>
@@ -354,11 +396,6 @@ export default function Detail() {
                 )}
                 {project.status === "FAILED" && (
                   <p className={styles.reviewingMsg}>😢 목표 금액에 도달하지 못했습니다. 후원자분들께 환불이 진행됩니다.</p>
-                )}
-                {(project.status === "DRAFT" || project.status === "FUNDING") && (
-                  <button className={styles.deleteReqBtn} onClick={handleDeleteRequest}>
-                    삭제 요청
-                  </button>
                 )}
               </div>
             )}
