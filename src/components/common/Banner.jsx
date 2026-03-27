@@ -79,22 +79,8 @@ export default function Banner() {
       tabIndex={0}
     >
       <div className={styles.inner} style={{ background: current.gradient }}>
-        {/* 슬라이드 배경 썸네일 (흐릿하게) */}
-        {current.thumbnail && (
-          <img
-            src={current.thumbnail}
-            alt=""
-            style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              objectFit: "cover", opacity: 0.18,
-              zIndex: 0,
-            }}
-          />
-        )}
-
         {/* Text */}
-        <div className={styles.content}>
+        <div className={styles.content} style={{ zIndex: 2, position: "relative" }}>
           <h2 className={styles.title} style={{ whiteSpace: "pre-line" }}>
             {current.title}
           </h2>
@@ -102,7 +88,7 @@ export default function Banner() {
         </div>
 
         {/* 프로젝트 이미지 카드들 */}
-        <div className={styles.books}>
+        <div className={styles.books} style={{ zIndex: 2 }}>
           {previewImgs.map((src, i) => (
             <div key={i} className={`${styles.book} ${styles[`book${i}`]}`}>
               <img src={src} alt="" />
