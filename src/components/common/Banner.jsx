@@ -3,46 +3,73 @@
 ───────────────────────────────────────── */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getProjects } from "../../api/projects";
 import styles from "./Banner.module.css";
 
-const SLIDES = [
-  {
-    title: "꿈과 현실 사이\n아슬아슬 집착 로맨스!",
-    sub: "〈꿈에서 자유로〉 단행본 완결권",
-    gradient: "linear-gradient(135deg, #1C1C2E 0%, #2d1f3d 100%)",
-    projectId: 1,
-  },
-  {
-    title: "나만의 창작물을\n세상에 선보이세요",
-    sub: "창작자와 후원자를 잇는 플랫폼",
-    gradient: "linear-gradient(135deg, #1a2a3a 0%, #1C1C2E 100%)",
-    projectId: 5,
-  },
-  {
-    title: "한정판 굿즈와\n작가의 이야기",
-    sub: "지금 바로 후원하고 특별한 경험을",
-    gradient: "linear-gradient(135deg, #2a1a1a 0%, #1C1C2E 100%)",
-    projectId: 4,
-  },
+const GRADIENTS = [
+  "linear-gradient(135deg, #1C1C2E 0%, #2d1f3d 100%)",
+  "linear-gradient(135deg, #1a2a3a 0%, #1C1C2E 100%)",
+  "linear-gradient(135deg, #2a1a1a 0%, #1C1C2E 100%)",
 ];
 
-const PREVIEW_IMGS = [
-  "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&q=70",
-  "https://images.unsplash.com/photo-1618519764620-7403abdbdfe9?w=200&q=70",
-  "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=70",
-  "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=200&q=70",
-];
+// 배열에서 n개 랜덤 추출
+function pickRandom(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
 
 export default function Banner() {
   const [slide, setSlide] = useState(0);
+  const [slides, setSlides] = useState([]);
+  const [previewImgs, setPreviewImgs] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const t = setInterval(() => setSlide(s => (s + 1) % SLIDES.length), 4200);
-    return () => clearInterval(t);
+    getProjects({ status: "FUNDING", size: 20 })
+      .then(res => {
+        const projects = res?.content ?? res?.data?.content ?? [];
+        if (projects.length === 0) return;
+
+        // 썸네일 있는 프로젝트만 필터
+        const withThumb = projects.filter(p => p.thumbnailUrl);
+
+        // 슬라이드용 3개 랜덤 선택
+        const slideProjects = pickRandom(withThumb.length > 0 ? withThumb : projects, Math.min(3, projects.length));
+        setSlides(slideProjects.map((p, i) => ({
+          title: p.title,
+          sub: p.ownerNickname ?? "창작자",
+          gradient: GRADIENTS[i % GRADIENTS.length],
+          projectId: p.id,
+          thumbnail: p.thumbnailUrl,
+        })));
+
+        // 미리보기 이미지 4개 (슬라이드와 다른 프로젝트에서)
+        const others = withThumb.filter(p => !slideProjects.find(s => s.id === p.id));
+        const previews = pickRandom(others.length >= 4 ? others : withThumb, Math.min(4, withThumb.length));
+        setPreviewImgs(previews.map(p => p.thumbnailUrl));
+      })
+      .catch(() => {});
   }, []);
 
-  const current = SLIDES[slide];
+  useEffect(() => {
+    if (slides.length === 0) return;
+    const t = setInterval(() => setSlide(s => (s + 1) % slides.length), 4200);
+    return () => clearInterval(t);
+  }, [slides]);
+
+  // 로딩 중이거나 프로젝트 없으면 기본 배너
+  if (slides.length === 0) return (
+    <div className={styles.wrap}>
+      <div className={styles.inner} style={{ background: GRADIENTS[0] }}>
+        <div className={styles.content}>
+          <h2 className={styles.title}>나만의 창작물을{"\n"}세상에 선보이세요</h2>
+          <p className={styles.sub}>창작자와 후원자를 잇는 플랫폼</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const current = slides[slide];
 
   return (
     <div
@@ -52,6 +79,20 @@ export default function Banner() {
       tabIndex={0}
     >
       <div className={styles.inner} style={{ background: current.gradient }}>
+        {/* 슬라이드 배경 썸네일 (흐릿하게) */}
+        {current.thumbnail && (
+          <img
+            src={current.thumbnail}
+            alt=""
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover", opacity: 0.18,
+              zIndex: 0,
+            }}
+          />
+        )}
+
         {/* Text */}
         <div className={styles.content}>
           <h2 className={styles.title} style={{ whiteSpace: "pre-line" }}>
@@ -60,9 +101,9 @@ export default function Banner() {
           <p className={styles.sub}>{current.sub}</p>
         </div>
 
-        {/* Book previews */}
+        {/* 프로젝트 이미지 카드들 */}
         <div className={styles.books}>
-          {PREVIEW_IMGS.map((src, i) => (
+          {previewImgs.map((src, i) => (
             <div key={i} className={`${styles.book} ${styles[`book${i}`]}`}>
               <img src={src} alt="" />
             </div>
@@ -71,7 +112,7 @@ export default function Banner() {
 
         {/* Pagination */}
         <div className={styles.dots}>
-          {SLIDES.map((_, i) => (
+          {slides.map((_, i) => (
             <button
               key={i}
               className={`${styles.dot} ${i === slide ? styles.dotActive : ""}`}
@@ -82,7 +123,7 @@ export default function Banner() {
         </div>
 
         {/* Slide counter */}
-        <span className={styles.counter}>{slide + 1} / {SLIDES.length}</span>
+        <span className={styles.counter}>{slide + 1} / {slides.length}</span>
       </div>
     </div>
   );
