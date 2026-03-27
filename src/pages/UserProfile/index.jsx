@@ -44,8 +44,8 @@ export default function UserProfile() {
       getFollowerCount(userId).then(r => r?.data ?? r ?? 0).catch(() => 0),
       getFollowingCount(userId).then(r => r?.data ?? r ?? 0).catch(() => 0),
       // 해당 유저 프로젝트 목록
-      getProjects({ ownerId: userId, status: "FUNDING", size: 20 })
-        .then(r => r?.content ?? []).catch(() => []),
+      getProjects({ ownerId: userId, size: 50 })
+        .then(r => (r?.content ?? []).filter(p => p.status !== "DELETED")).catch(() => []),
       // 팔로워/팔로잉 목록
       getFollowers(userId).catch(() => []),
       getFollowings(userId).catch(() => []),
