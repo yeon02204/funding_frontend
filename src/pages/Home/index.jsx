@@ -16,7 +16,7 @@ export default function Home() {
 
 
   const { data: popularData } = useProjects({ status: "FUNDING", sortBy: "likes", size: 6 });
-  const { data: newData, loading: newLoading } = useProjects({ status: "FUNDING", size: 8 });
+  const { data: newData, loading: newLoading } = useProjects({ status: "FUNDING", size: 9 });
 
   const popular = popularData?.content ?? [];
   const newList = newData?.content ?? [];
