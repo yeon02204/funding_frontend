@@ -2,17 +2,17 @@
    pages/EditProject/index.jsx
 
    API:  PATCH /api/projects/{id}
-   DRAFT 상태인 본인 프로젝트만 수정 가능
+   DRAFT / REJECTED 상태인 본인 프로젝트만 수정 가능
 ───────────────────────────────────────── */
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
-import { getProject, updateProject } from "../../api/projects";
+import { getProject, updateProject, updateProjectImages } from "../../api/projects";
 import { getCategories } from "../../api/categories";
 import styles from "../CreateProject/CreateProject.module.css";
 
-const STEPS = ["기본 정보", "프로젝트 스토리", "펀딩 설정"];
+const STEPS = ["기본 정보", "프로젝트 스토리", "펀딩 설정", "이미지"];
 
 export default function EditProject() {
   const { id }    = useParams();
@@ -25,6 +25,15 @@ export default function EditProject() {
   const [error,      setError]      = useState("");
   const [categories, setCategories] = useState([]);
   const [content,    setContent]    = useState("");
+
+  // 기존 이미지 URL (서버에 저장된 것)
+  const [existingImages,   setExistingImages]   = useState([]);
+  const [existingThumbUrl, setExistingThumbUrl] = useState(null);
+
+  // 새로 추가할 이미지 파일
+  const [newImages,   setNewImages]   = useState([]);
+  const [newPreviews, setNewPreviews] = useState([]);
+  const [thumbSource, setThumbSource] = useState("existing"); // "existing" | number(new index)
 
   const [form, setForm] = useState({
     title:      "",
@@ -48,12 +57,32 @@ export default function EditProject() {
         });
         setContent(p.content ?? "");
         setCategories(cats);
+        setExistingImages(p.imageUrls ?? []);
+        setExistingThumbUrl(p.thumbnailUrl ?? null);
       })
       .catch(() => setError("프로젝트 정보를 불러올 수 없습니다."))
       .finally(() => setLoading(false));
   }, [id]);
 
+  /* 새 이미지 미리보기 URL */
+  useEffect(() => {
+    const urls = newImages.map((f) => URL.createObjectURL(f));
+    setNewPreviews(urls);
+    return () => urls.forEach(URL.revokeObjectURL);
+  }, [newImages]);
+
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
+
+  const handleNewImageAdd = (e) => {
+    const files = Array.from(e.target.files);
+    setNewImages((prev) => [...prev, ...files].slice(0, 5));
+    e.target.value = "";
+  };
+
+  const removeNewImage = (idx) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== idx));
+    if (thumbSource === idx) setThumbSource("existing");
+  };
 
   const durationDays = form.startAt && form.deadline
     ? Math.ceil((new Date(form.deadline) - new Date(form.startAt)) / 86400000)
@@ -64,12 +93,14 @@ export default function EditProject() {
     true,
     !!(form.goalAmount && form.startAt && form.deadline &&
        new Date(form.startAt) < new Date(form.deadline)),
+    true, // 이미지는 기존 것 유지 가능하므로 필수 아님
   ];
 
   const handleSubmit = async () => {
     setError("");
     setSubmitting(true);
     try {
+      // 1단계: 기본 정보 수정
       await updateProject(id, {
         title:      form.title.trim(),
         content,
@@ -78,6 +109,13 @@ export default function EditProject() {
         startAt:    form.startAt  + ":00",
         deadline:   form.deadline + ":00",
       });
+
+      // 2단계: 새 이미지가 있으면 업로드
+      if (newImages.length > 0) {
+        const thumbnailIndex = thumbSource === "existing" ? 0 : thumbSource;
+        await updateProjectImages(id, newImages, thumbnailIndex);
+      }
+
       alert("수정이 완료되었습니다.");
       navigate(`/projects/${id}`);
     } catch (e) {
@@ -128,7 +166,6 @@ export default function EditProject() {
                 <h2 className={styles.sectionTitle}>기본 정보</h2>
                 <p className={styles.sectionDesc}>프로젝트의 제목과 카테고리를 수정하세요.</p>
               </div>
-
               <div className={styles.field}>
                 <label className={styles.label}>프로젝트 제목 <span className={styles.req}>*</span></label>
                 <input
@@ -142,7 +179,6 @@ export default function EditProject() {
                   <span className={styles.charCount}>{form.title.length}/100</span>
                 </div>
               </div>
-
               <div className={styles.field}>
                 <label className={styles.label}>카테고리 <span className={styles.req}>*</span></label>
                 <div className={styles.catGrid}>
@@ -176,19 +212,19 @@ export default function EditProject() {
                   previewStyle="vertical"
                   initialValue={content || " "}
                   language="ko-KR"
-                                    hooks={{
-                      addImageBlobHook: async (blob, callback) => {
-                        try {
-                          const formData = new FormData();
-                          formData.append("file", blob);
-                          const { default: client } = await import("../../api/client");
-                          const res = await client.post("/api/uploads/images", formData);
-                          callback(res.data.url, "image");
-                        } catch (e) {
-                          alert("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
-                        }
-                      },
-                    }}
+                  hooks={{
+                    addImageBlobHook: async (blob, callback) => {
+                      try {
+                        const formData = new FormData();
+                        formData.append("file", blob);
+                        const { default: client } = await import("../../api/client");
+                        const res = await client.post("/api/uploads/images", formData);
+                        callback(res.data.url, "image");
+                      } catch (e) {
+                        alert("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+                      }
+                    },
+                  }}
                 />
               </div>
             </div>
@@ -201,7 +237,6 @@ export default function EditProject() {
                 <h2 className={styles.sectionTitle}>펀딩 설정</h2>
                 <p className={styles.sectionDesc}>목표 금액과 펀딩 기간을 수정하세요.</p>
               </div>
-
               <div className={styles.field}>
                 <label className={styles.label}>목표 금액 <span className={styles.req}>*</span></label>
                 <div className={styles.amountRow}>
@@ -217,26 +252,19 @@ export default function EditProject() {
                   <p className={styles.amountPreview}>= {Number(form.goalAmount).toLocaleString()}원</p>
                 )}
               </div>
-
               <div className={styles.field}>
                 <label className={styles.label}>펀딩 기간 <span className={styles.req}>*</span></label>
                 <div className={styles.dateRow}>
                   <div className={styles.dateItem}>
                     <span className={styles.dateTag}>시작</span>
-                    <input
-                      className={styles.input} type="datetime-local"
-                      value={form.startAt}
-                      onChange={(e) => set("startAt", e.target.value)}
-                    />
+                    <input className={styles.input} type="datetime-local" value={form.startAt}
+                      onChange={(e) => set("startAt", e.target.value)} />
                   </div>
                   <span className={styles.dateArrow}>→</span>
                   <div className={styles.dateItem}>
                     <span className={styles.dateTag}>마감</span>
-                    <input
-                      className={styles.input} type="datetime-local"
-                      value={form.deadline} min={form.startAt}
-                      onChange={(e) => set("deadline", e.target.value)}
-                    />
+                    <input className={styles.input} type="datetime-local" value={form.deadline} min={form.startAt}
+                      onChange={(e) => set("deadline", e.target.value)} />
                   </div>
                 </div>
                 {durationDays !== null && durationDays > 0 && (
@@ -246,6 +274,72 @@ export default function EditProject() {
                   <p className={styles.dateError}>마감일은 시작일보다 늦어야 합니다.</p>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* ── STEP 3: 이미지 ── */}
+          {step === 3 && (
+            <div>
+              <div className={styles.sectionHead}>
+                <h2 className={styles.sectionTitle}>이미지 수정</h2>
+                <p className={styles.sectionDesc}>
+                  새 이미지를 추가하면 기존 이미지가 교체됩니다. 추가하지 않으면 기존 이미지가 유지됩니다.
+                </p>
+              </div>
+
+              {/* 기존 이미지 */}
+              {existingImages.length > 0 && newImages.length === 0 && (
+                <div style={{ marginBottom: 24 }}>
+                  <p style={{ fontSize: 13, color: "var(--mid)", marginBottom: 10 }}>📌 현재 이미지</p>
+                  <div className={styles.imgGrid}>
+                    {existingImages.map((url, i) => (
+                      <div key={i} className={`${styles.imgCard} ${url === existingThumbUrl ? styles.imgCardThumb : ""}`}>
+                        <img src={url} alt="" className={styles.imgThumb} />
+                        {url === existingThumbUrl && (
+                          <div className={styles.imgActions}>
+                            <span className={`${styles.btnThumb} ${styles.btnThumbOn}`}>★ 대표</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 새 이미지 추가 */}
+              {newImages.length < 5 && (
+                <label className={styles.dropzone}>
+                  <input type="file" accept="image/*" multiple hidden onChange={handleNewImageAdd} />
+                  <span className={styles.dropIcon}>🖼</span>
+                  <span className={styles.dropText}>
+                    {newImages.length === 0 ? "클릭하여 새 이미지 추가 (선택)" : "이미지 추가"}
+                  </span>
+                  <span className={styles.dropSub}>JPG · PNG · GIF — 파일당 최대 20MB · {newImages.length}/5</span>
+                </label>
+              )}
+
+              {/* 새 이미지 미리보기 */}
+              {newPreviews.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 13, color: "var(--coral)", margin: "16px 0 10px" }}>🆕 새로 추가할 이미지</p>
+                  <div className={styles.imgGrid}>
+                    {newPreviews.map((url, i) => (
+                      <div key={i} className={`${styles.imgCard} ${thumbSource === i ? styles.imgCardThumb : ""}`}>
+                        <img src={url} alt="" className={styles.imgThumb} />
+                        <div className={styles.imgActions}>
+                          <button
+                            className={`${styles.btnThumb} ${thumbSource === i ? styles.btnThumbOn : ""}`}
+                            onClick={() => setThumbSource(i)}
+                          >
+                            {thumbSource === i ? "★ 대표" : "☆ 대표"}
+                          </button>
+                          <button className={styles.btnRemove} onClick={() => removeNewImage(i)}>✕</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

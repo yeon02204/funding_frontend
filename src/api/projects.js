@@ -116,3 +116,13 @@ export const updateProject = (projectId, data) =>
 
 export const deleteRejectedProject = (id) =>
   client.post(`/api/projects/${id}/delete-rejected`).then(r => r.data);
+// 이미지 교체  POST /api/projects/{id}/images
+export const updateProjectImages = (id, images, thumbnailIndex = 0) => {
+  const formData = new FormData();
+  formData.append(
+    "request",
+    new Blob([JSON.stringify({ thumbnailIndex })], { type: "application/json" })
+  );
+  images.forEach((f) => formData.append("images", f));
+  return client.post(`/api/projects/${id}/images`, formData).then((r) => r.data);
+};
