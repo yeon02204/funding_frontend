@@ -113,3 +113,6 @@ export const updateProjectTags = (projectId, tags) =>
  */
 export const updateProject = (projectId, data) =>
   client.patch(`/api/projects/${projectId}`, data).then((r) => r.data);
+
+export const deleteRejectedProject = (id) =>
+  client.post(`/api/projects/${id}/delete-rejected`).then(r => r.data);
