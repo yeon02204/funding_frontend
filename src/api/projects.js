@@ -126,3 +126,7 @@ export const updateProjectImages = (id, images, thumbnailIndex = 0) => {
   images.forEach((f) => formData.append("images", f));
   return client.post(`/api/projects/${id}/images`, formData).then((r) => r.data);
 };
+
+// 이미지 단건 삭제  DELETE /api/projects/{id}/images?imageUrl=...
+export const deleteProjectImage = (id, imageUrl) =>
+  client.delete(`/api/projects/${id}/images`, { params: { imageUrl } }).then(r => r.data);

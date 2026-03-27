@@ -8,7 +8,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
-import { getProject, updateProject, updateProjectImages } from "../../api/projects";
+import { getProject, updateProject, updateProjectImages, deleteProjectImage } from "../../api/projects";
 import { getCategories } from "../../api/categories";
 import styles from "../CreateProject/CreateProject.module.css";
 
@@ -82,6 +82,19 @@ export default function EditProject() {
   const removeNewImage = (idx) => {
     setNewImages((prev) => prev.filter((_, i) => i !== idx));
     if (thumbSource === idx) setThumbSource("existing");
+  };
+
+  const handleDeleteExistingImage = async (url) => {
+    if (!window.confirm("이미지를 삭제하시겠습니까?")) return;
+    try {
+      await deleteProjectImage(id, url);
+      setExistingImages(prev => prev.filter(u => u !== url));
+      if (existingThumbUrl === url) {
+        setExistingThumbUrl(prev => existingImages.find(u => u !== url) ?? null);
+      }
+    } catch (e) {
+      alert("이미지 삭제에 실패했습니다.");
+    }
   };
 
   const durationDays = form.startAt && form.deadline
@@ -295,11 +308,12 @@ export default function EditProject() {
                     {existingImages.map((url, i) => (
                       <div key={i} className={`${styles.imgCard} ${url === existingThumbUrl ? styles.imgCardThumb : ""}`}>
                         <img src={url} alt="" className={styles.imgThumb} />
-                        {url === existingThumbUrl && (
-                          <div className={styles.imgActions}>
+                        <div className={styles.imgActions}>
+                          {url === existingThumbUrl && (
                             <span className={`${styles.btnThumb} ${styles.btnThumbOn}`}>★ 대표</span>
-                          </div>
-                        )}
+                          )}
+                          <button className={styles.btnRemove} onClick={() => handleDeleteExistingImage(url)}>✕</button>
+                        </div>
                       </div>
                     ))}
                   </div>
